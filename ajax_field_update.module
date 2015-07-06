@@ -24,10 +24,15 @@ function ajax_field_update_update_field($entity_type, $entity_id, $field_name){
 
   if(entity_access('update',$entity_type, $entity)){
 
-    if(isset($_REQUEST['value'])){
+    if(isset($_POST['value'])){
 
       // @todo: massive todo here, assumes LANGUAGE_NONE, cardinality 1, "value". basically just for single value text fields atm
-      $entity->{$field_name}[LANGUAGE_NONE][0]['value'] = $_REQUEST['value'];
+      // - actually I guess I can just pass all that in too:
+      $language = isset($_POST['lang']) ? $_POST['lang'] : LANGUAGE_NONE;
+      $delta = isset($_POST['delta']) ? $_POST['delta'] : 0;
+      $target = isset($_POST['target']) ? $_POST['target'] : 'value';
+      // 'target' could be eg 'value', 'tid', etc
+      $entity->{$field_name}[$language][$delta][$target] = $_POST['value'];
       
       $result = entity_save($entity_type,$entity);
 

@@ -1,0 +1,4 @@
+name = Ajax field update
+description = An API for updating entity fields via ajax callbacks
+core = 7.x
+version = 1.0

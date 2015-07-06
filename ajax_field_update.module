@@ -1,0 +1,59 @@
+<?php
+
+
+function ajax_field_update_menu(){
+  
+  $items = array();
+
+  $items['ajax_field_update/%/%/%'] = array(
+    'title' => 'Ajax field update',
+    'page callback' => 'ajax_field_update_update_field',
+    'page arguments' => array(1,2,3),
+    'access arguments' => array('access content'),
+    'description' => '',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+
+}
+
+function ajax_field_update_update_field($entity_type, $entity_id, $field_name){
+
+  $entity = entity_load_single($entity_type,$entity_id);
+
+  if(entity_access('update',$entity_type, $entity)){
+
+    if(isset($_REQUEST['value'])){
+
+      // @todo: massive todo here, assumes LANGUAGE_NONE, cardinality 1, "value". basically just for single value text fields atm
+      $entity->{$field_name}[LANGUAGE_NONE][0]['value'] = $_REQUEST['value'];
+      
+      $result = entity_save($entity_type,$entity);
+
+      if($result !== false){
+        $result = 'Updated ' . $field_name;
+        $success = 1;
+      }else{
+        $result = "Couldn't save entity";
+
+        $success = 0;
+      }
+
+    }else{
+
+      $result = 'no value supplied!';
+      $success = 0;
+
+    }
+
+  }else{
+
+    $result = 'access denied!';
+    $success = 0;
+  
+  }
+
+  drupal_json_output(array('result' => $result, 'success' => $success));
+
+}
